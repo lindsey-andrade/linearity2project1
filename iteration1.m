@@ -19,7 +19,8 @@ I=b.*h.^3./12;%Second Area moment of the beam.
 A=b.*h; %Cross sectional area
 R=span./(2*sin(alpha));
 ibar=I./(A.*R.^2); % Some weird way of consolidating geometric factors??
-lam=(2.*R./h).*(1-cos(alpha)); %Another geometric adjustment.
+lam=(alpha.^4)./(12.*ibar);
+%lam=(2.*R./h).*(1-cos(alpha)); %Another geometric adjustment.
 z= R-R.*cos(alpha); %The segment height.
 arc_l=((2*alpha)/(2*pi)).*pi*2.*R;
 
@@ -50,7 +51,6 @@ plot(alpha,arc_l);
 title('Arc Length as a function of Alpha');
 xlabel('alpha(rad)');
 ylabel('length (m)');
-
 
 %The yield strength of steel of 434MPa! That's A LOT.
 end
