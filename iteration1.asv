@@ -37,9 +37,7 @@ sum = comp + bend;
 base_beam_volume = 0.9144; % 36" = 0.9144m
 cost_per_unit_vol = 60/base_beam_volume; % $/m^3
 
-volume_of_beam = b * h * arc_l;
-
-cost_of_beam = volume_of_beam * cost_per_unit_vol;
+volume_of_beam = b * h * arc_1; %  
 
 res = [comp, bend, sum];
 
@@ -59,12 +57,6 @@ plot(alpha,arc_l);
 title('Arc Length as a function of Alpha');
 xlabel('alpha(rad)');
 ylabel('length (m)');
-
-figure(3)
-plot(alpha, cost_of_beam)
-title('Cost of Beam as a Function of Alpha');
-xlabel('Alpha (rad)');
-ylabel('Cost ($)');
 
 
 %The yield strength of steel of 434MPa! That's A LOT.
