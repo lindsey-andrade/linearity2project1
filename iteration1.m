@@ -22,23 +22,37 @@ function res = iteration1(b, h)
     lam=(alpha.^4)./(12.*ibar);
     %lam=(2.*R./h).*(1-cos(alpha)); %Another geometric adjustment.
     z= R-R.*cos(alpha); %The segment height.
-    arc_l=((2*alpha)/(2*pi)).*pi*2.*R;
+    arc_l=((2*alpha)/(2*pi)).*pi*2.*R; %Arc length
 
     %In the paper these are a sum, but I split them up because they are easier
     %to read that way :)
-    str_cr_comp=((q.*R./A)./(1+(8/5).*lam.^2)).*((8/5)*lam.^2);
-    str_cr_bend=((q.*R./A)./(1+(8/5).*lam.^2)).*((2.*z./h)*3.*lam);
+    str_cr_comp=((q.*R./A)./(1+(8/5).*lam.^2)).*((8/5)*lam.^2)
+    str_cr_bend=((q.*R./A)./(1+(8/5).*lam.^2)).*((2.*z./h)*3.*lam)
 
     comp = str_cr_comp/1000000;
     bend = str_cr_bend/1000000;
     sum = comp + bend;
+
+
+    %Calculating the cost of the beam based on a 1"x1"x36" beam costs $60
+    base_beam_volume = 0.9144; % 36" = 0.9144m
+    cost_per_unit_vol = 60/base_beam_volume; % $/m^3
+
+    volume_of_beam = b * h * arc_l;
+
+    cost_of_beam = volume_of_beam * cost_per_unit_vol;
+    %This cost function can be made a little more "real world" in the following ways
+    %Price break for bulk material usage
+    %Machining/Overhead fees for using strange sizes (b=0.129, h=0.741?)
+    %Diffrent price,A,I functions for different cross section geometry. I,C,box,channel extrusions, etc.
+
 
     res = [comp, bend, sum];
 
     figure(1);
     clf();
     hold on;
-    plot(alpha, str_cr_comp/1000000,'b');
+    plot(alpha, str_cr_comp/1000000,'b');%btw, the 1000000's are unit conversions to MPa from Pa.
     plot(alpha, str_cr_bend/1000000,'r');
     plot(alpha, (str_cr_bend+str_cr_comp)/1000000,'g');
     xlabel('Alpha (rad)');
@@ -51,6 +65,14 @@ function res = iteration1(b, h)
     title('Arc Length as a function of Alpha');
     xlabel('alpha(rad)');
     ylabel('length (m)');
+
+
+    figure(3)
+    plot(alpha, cost_of_beam)
+    title('Cost of Beam as a Function of Alpha');
+    xlabel('Alpha (rad)');
+    ylabel('Cost ($)');
+
 
     %The yield strength of steel of 434MPa! That's A LOT.
 end
