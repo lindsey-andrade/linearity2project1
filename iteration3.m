@@ -1,6 +1,8 @@
-function iteration3()
+function [fval,x,exitflag]=iteration3(cforce,mspan,ustrength,beamratio,bc,vc)
 
-P = 1000; 
+P = cforce; %Linear Force applied @ the crown
+min_span=mspan; %minimum distance the bridge must span.
+ultimate_strength=ustrength; %maximum stress the material can take.
 
     function [vol] = volume(X)
         theta = X(1); 
@@ -17,15 +19,15 @@ P = 1000;
         b = X(3); 
         c = X(4);
         
-        b_c=1*b*((a+c)/2)^3; %The cost per bend degree
-        v_c=4301; % $/m^3 from http://www.roymech.co.uk/Useful_Tables/Matter/Costs.html
+        b_c=bc; %The cost per bend degree
+        v_c=vc; % $/m^3 from http://www.roymech.co.uk/Useful_Tables/Matter/Costs.html
         
         vol=(theta/2)*(a+c)*(b*(c-a));
         
         %The statement on the next line says...
         %The beam costs v_c per unit of volume
         %And additional costs are incurred for pre-bending.
-        t_c=b_c*theta*+(v_c*vol); 
+        t_c=b_c*theta+(v_c*vol); 
     end
 
     function [c, ceq] = stress(X)
@@ -61,24 +63,14 @@ P = 1000;
         
         span = 2*e_x;
         
-        c = totalStress-670000;
+        c = totalStress-ultimate_strength;
         
-        ceq = 10-span;
+        ceq = min_span-span;
     end
 
-% data=zeros(1,90);
-% test_angle=0;
-% for j=1:90
-%     data(j)=stress([test_angle/57.3, 30, 50, 80]);
-%     test_angle=test_angle+1;
-% end
-% plot(data)
 
-%test_data=[0 4 3 10]
-%s=stress(test_data)
-%v=volume(test_data)
 
-[x,fval]=fmincon(@cost,[pi/6;1;1;2],[0 1 0 -1],[0],[],[],[0;0;0;0],[pi/2;1e+10;1e+10;1e+10],@stress);
-disp(x)
-disp(fval)
+op = optimset('fmincon');
+op = optimset(op,'MaxFunEvals',50000,'MaxIter',5000);
+[x,fval,exitflag]=fmincon(@cost,[pi/8;100;3;110],[0 1 0 -1;0 -1 -beamratio 1;],[0;0],[],[],[0;0;0;0],[pi/2;1e+10;1e+10;1e+10],@stress,op);
 end
