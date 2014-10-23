@@ -53,24 +53,26 @@ ultimate_strength=ustrength; %maximum stress the material can take.
         
         Am = b*log(c/a);
         
-        tStress = N/A + M*(A - a*Am)/(A*a*(R*Am - A));
+        tStress = N/A + M*(A - a*Am)/(A*a*(R*Am - A)); %will be +
         
-        cStress = N/A + M*(A - c*Am)/(A*c*(R*Am - A)); 
-        
-        totalStress = tStress + cStress;  
+        cStress = N/A + M*(A - c*Am)/(A*c*(R*Am - A)); %will be -
         
         % For optimization
         
         span = 2*e_x;
         
-        c = totalStress-ultimate_strength;
+        c = tStress-ultimate_strength;
         
         ceq = min_span-span;
     end
 
-
+%Start with some reasonable init values.
+i_theta=pi/8;
+i_a=(min_span/sin(i_theta))/2;
+i_b=1;
+i_c=((min_span/sin(i_theta))/2)+1;
 
 op = optimset('fmincon');
-op = optimset(op,'MaxFunEvals',50000,'MaxIter',5000);
-[x,fval,exitflag]=fmincon(@cost,[pi/8;100;3;110],[0 1 0 -1;0 -1 -beamratio 1;],[0;0],[],[],[0;0;0;0],[pi/2;1e+10;1e+10;1e+10],@stress,op);
+op = optimset(op,'MaxFunEvals',50000,'MaxIter',10000);
+[x,fval,exitflag]=fmincon(@cost,[i_theta,i_a,i_b,i_c],[0 1 0 -1;0 -1 -beamratio 1;],[0;0],[],[],[0;0;0;0],[pi/2;1e+10;1e+10;1e+10],@stress,op);
 end
